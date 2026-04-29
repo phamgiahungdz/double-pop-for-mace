@@ -1,49 +1,29 @@
-package com.example.addon;
+package your.package.name;
 
-import com.example.addon.commands.CommandExample;
-import com.example.addon.hud.HudExample;
-import com.example.addon.modules.ModuleExample;
-import com.mojang.logging.LogUtils;
-import meteordevelopment.meteorclient.addons.GithubRepo;
+import your.package.name.modules.DoublePopMace;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
-import meteordevelopment.meteorclient.commands.Commands;
-import meteordevelopment.meteorclient.systems.hud.Hud;
-import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
-import org.slf4j.Logger;
 
-public class AddonTemplate extends MeteorAddon {
-    public static final Logger LOG = LogUtils.getLogger();
-    public static final Category CATEGORY = new Category("Example");
-    public static final HudGroup HUD_GROUP = new HudGroup("Example");
+public class Addon extends MeteorAddon {
+    // Custom category for your addon modules
+    public static final Category CATEGORY = new Category("Custom Combat");
 
     @Override
     public void onInitialize() {
-        LOG.info("Initializing Meteor Addon Template");
-
-        // Modules
-        Modules.get().add(new ModuleExample());
-
-        // Commands
-        Commands.add(new CommandExample());
-
-        // HUD
-        Hud.get().register(HudExample.INFO);
+        // Registers your module so it appears in the ClickGUI
+        Modules.get().add(new DoublePopMace());
     }
 
     @Override
     public void onRegisterCategories() {
+        // Makes your custom category visible in the Meteor GUI
         Modules.registerCategory(CATEGORY);
     }
 
     @Override
     public String getPackage() {
-        return "com.example.addon";
-    }
-
-    @Override
-    public GithubRepo getRepo() {
-        return new GithubRepo("MeteorDevelopment", "meteor-addon-template");
+        // Must match your source folder structure exactly
+        return "your.package.name";
     }
 }
