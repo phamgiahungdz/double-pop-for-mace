@@ -1,37 +1,22 @@
 package com.example.addon.modules;
 
-import meteordevelopment.meteorclient.events.packets.PacketEvent;
-import meteordevelopment.meteorclient.systems.modules.Categories;
+import meteordevelopment.meteorclient.events.entity.player.InteractEntityEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 
-public class DoublePopMace extends Module {
-    public DoublePopMace() {
-        super(Categories.Combat, "double-pop-mace", "Sends an extra attack packet in the same tick.");
+public class DoubleAttack extends Module {
+    public DoubleAttack() {
+        super(Categories.Combat, "double-attack", "Attacks a second time in the same tick.");
     }
 
     @EventHandler
-    private void onSendPacket(PacketEvent.Send event) {
-        // Listen for the player's manual interaction packet
-        if (event.packet instanceof ServerboundInteractPacket packet) {
-            
-            // In 1.21, we check the player's current hit result
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY) {
-                Entity entity = ((EntityHitResult) mc.hitResult).getEntity();
+    private void onInteractEntity(InteractEntityEvent event) {
+        // Ensure it is an attack interaction and the entity is valid
+        if (event.action != InteractEntityEvent.Action.Attack || event.entity == null) return;
 
-                if (entity != null) {
-                    // Modern 1.21 Mojang way to send an attack packet
-                    // 'performInteraction' is often restricted, so we use 'attack'
-                    mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(
-                        entity, 
-                        mc.player.isShiftKeyDown()
-                    ));
-                }
-            }
-        }
+        // Send a manual attack packet immediately after the first one
+        mc.getNetworkHandler().sendPacket(PlayerInteractEntityC2SPacket.attack(event.entity, mc.player.isSneaking()));
     }
 }
