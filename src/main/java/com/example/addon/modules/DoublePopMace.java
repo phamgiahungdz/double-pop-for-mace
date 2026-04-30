@@ -1,35 +1,35 @@
 package com.example.addon.modules;
 
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
-import meteordevelopment.meteorclient.systems.modules.Categories;
+import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.entity.Entity;
 
 public class DoublePopMace extends Module {
     public DoublePopMace() {
-        // Use Categories.Combat for 1.20+ Meteor addons
-        super(Categories.Combat, "double-pop-mace", "Sends a second attack packet instantly on hit.");
+        // Using Category.COMBAT (Yarn name)
+        super(Category.COMBAT, "double-pop-mace", "Sends an extra attack packet in the same tick.");
     }
 
     @EventHandler
     private void onSendPacket(PacketEvent.Send event) {
-        // Listen for the player's manual attack packet
-        if (event.packet instanceof ServerboundInteractPacket packet) {
+        // PlayerInteractEntityC2SPacket is the Yarn name for the attack packet
+        if (event.packet instanceof PlayerInteractEntityC2SPacket packet) {
             
-            // We use the player's current crosshair target to identify the entity
-            // This is the most compatible way across different mapping versions
-            if (mc.crosshairTarget instanceof EntityHitResult hitResult) {
-                Entity entity = hitResult.getEntity();
+            // In 1.21 Yarn, mc.crosshairTarget is usually mc.crosshairTarget 
+            // but we must check if it's an Entity hit
+            if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.ENTITY) {
+                Entity entity = ((EntityHitResult) mc.crosshairTarget).getEntity();
 
                 if (entity != null) {
-                    // Send an identical attack packet in the same tick
-                    mc.getConnection().send(ServerboundInteractPacket.performInteraction(
+                    // This creates a second attack packet for the same entity
+                    mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.attack(
                         entity, 
-                        mc.player.isShiftKeyDown(), 
-                        ServerboundInteractPacket.InteractionAction.ATTACK
+                        mc.player.isSneaking()
                     ));
                 }
             }
