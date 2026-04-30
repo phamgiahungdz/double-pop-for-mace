@@ -11,26 +11,24 @@ import net.minecraft.world.phys.HitResult;
 
 public class DoublePopMace extends Module {
     public DoublePopMace() {
-        // Categories.Combat is the correct 1.21 Mojang name
         super(Categories.Combat, "double-pop-mace", "Sends an extra attack packet in the same tick.");
     }
 
     @EventHandler
     private void onSendPacket(PacketEvent.Send event) {
-        // ServerboundInteractPacket is the Mojang name for attack/interact
+        // Listen for the player's manual interaction packet
         if (event.packet instanceof ServerboundInteractPacket packet) {
             
-            // In modern versions, 'crosshairTarget' is renamed to 'hitResult'
+            // In 1.21, we check the player's current hit result
             if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY) {
                 Entity entity = ((EntityHitResult) mc.hitResult).getEntity();
 
                 if (entity != null) {
-                    // Logic to send the second attack packet
-                    // We use performInteraction to create the attack packet
-                    mc.getConnection().send(ServerboundInteractPacket.performInteraction(
+                    // Modern 1.21 Mojang way to send an attack packet
+                    // 'performInteraction' is often restricted, so we use 'attack'
+                    mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(
                         entity, 
-                        mc.player.isShiftKeyDown(), 
-                        ServerboundInteractPacket.InteractionAction.ATTACK
+                        mc.player.isShiftKeyDown()
                     ));
                 }
             }
