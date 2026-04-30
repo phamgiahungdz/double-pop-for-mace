@@ -9,20 +9,29 @@ import net.minecraft.world.entity.Entity;
 
 public class DoublePopMace extends Module {
     public DoublePopMace() {
-        // Changed Category.COMBAT to Categories.Combat to match Meteor's Mojang mapping style
         super(Categories.Combat, "double-pop-mace", "Sends an extra attack packet in the same tick.");
     }
 
     @EventHandler
     private void onSendPacket(PacketEvent.Send event) {
+        // We look for the interact packet (which handles attacks)
         if (event.packet instanceof ServerboundInteractPacket packet) {
-            // In Mojang mappings, we use a specific way to get the entity
-            // Using Meteor's 'mc' instance which is available in the Module class
-            Entity entity = packet.getTarget(mc.level);
             
-            if (entity != null) {
-                // Send the extra attack packet
-                mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(entity, mc.player.isShiftKeyDown()));
+            // We use Meteor's internal 'mc' instance to find what we are looking at
+            // This is safer than packet.getTarget() which varies by version
+            if (mc.crosshairTarget instanceof net.minecraft.world.phys.EntityHitResult hitResult) {
+                Entity entity = hitResult.getEntity();
+                
+                // Only trigger if we aren't already the one sending the extra packet
+                // (Prevents infinite loops)
+                if (entity != null) {
+                    // Send an attack packet using the official constructor
+                    mc.getConnection().send(ServerboundInteractPacket.performInteraction(
+                        entity, 
+                        mc.player.isShiftKeyDown(), 
+                        ServerboundInteractPacket.InteractionAction.ATTACK
+                    ));
+                }
             }
         }
     }
