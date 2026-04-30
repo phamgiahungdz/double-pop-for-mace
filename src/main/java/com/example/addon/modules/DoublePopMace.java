@@ -6,26 +6,26 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.EntityHitResult;
 
 public class DoublePopMace extends Module {
     public DoublePopMace() {
-        super(Categories.Combat, "double-pop-mace", "Sends an extra attack packet in the same tick.");
+        // Use Categories.Combat for 1.20+ Meteor addons
+        super(Categories.Combat, "double-pop-mace", "Sends a second attack packet instantly on hit.");
     }
 
     @EventHandler
     private void onSendPacket(PacketEvent.Send event) {
-        // We look for the interact packet (which handles attacks)
+        // Listen for the player's manual attack packet
         if (event.packet instanceof ServerboundInteractPacket packet) {
             
-            // We use Meteor's internal 'mc' instance to find what we are looking at
-            // This is safer than packet.getTarget() which varies by version
-            if (mc.crosshairTarget instanceof net.minecraft.world.phys.EntityHitResult hitResult) {
+            // We use the player's current crosshair target to identify the entity
+            // This is the most compatible way across different mapping versions
+            if (mc.crosshairTarget instanceof EntityHitResult hitResult) {
                 Entity entity = hitResult.getEntity();
-                
-                // Only trigger if we aren't already the one sending the extra packet
-                // (Prevents infinite loops)
+
                 if (entity != null) {
-                    // Send an attack packet using the official constructor
+                    // Send an identical attack packet in the same tick
                     mc.getConnection().send(ServerboundInteractPacket.performInteraction(
                         entity, 
                         mc.player.isShiftKeyDown(), 
