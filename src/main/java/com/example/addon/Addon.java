@@ -1,6 +1,6 @@
 package com.example.addon;
 
-import com.example.addon.modules.DoubleAttack; // Import your module
+import com.example.addon.modules.DoubleAttack;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -13,15 +13,13 @@ public class Addon extends MeteorAddon {
     public void onInitialize() {
         LOG.info("Initializing DoubleAttack Addon...");
 
-        // Modules
-        // This line registers your DoubleAttack module so it appears in the ClickGUI
+        // Register the DoubleAttack module
         Modules.get().add(new DoubleAttack());
     }
 
     @Override
     public void onRegisterCategories() {
-        // You can register custom categories here if needed
-        // For now, we are using the default 'Combat' category
+        // Using existing Categories.Combat
     }
 
     @Override
