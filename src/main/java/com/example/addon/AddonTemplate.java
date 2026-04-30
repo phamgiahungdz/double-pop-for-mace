@@ -16,8 +16,6 @@ public class AddonTemplate extends MeteorAddon {
     @Override
     public void onInitialize() {
         LOG.info("Initializing Double Pop Mace Addon...");
-
-        // Register the module
         Modules.get().add(new DoublePopMace());
     }
 
