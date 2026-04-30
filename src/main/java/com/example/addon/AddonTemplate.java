@@ -11,15 +11,13 @@ import org.slf4j.Logger;
 public class AddonTemplate extends MeteorAddon {
     public static final Logger LOG = LogUtils.getLogger();
     public static final Category CATEGORY = new Category("Mace Addon");
-    
-    // Define the HUD_GROUP that HudExample.java is looking for
     public static final HudGroup HUD_GROUP = new HudGroup("Mace HUD");
 
     @Override
     public void onInitialize() {
         LOG.info("Initializing Double Pop Mace Addon...");
 
-        // Modules
+        // Register the module
         Modules.get().add(new DoublePopMace());
     }
 
