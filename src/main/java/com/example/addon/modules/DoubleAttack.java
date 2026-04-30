@@ -13,9 +13,9 @@ public class DoubleAttack extends Module {
 
     @EventHandler
     private void onAttackEntity(AttackEntityEvent event) {
-        if (event.entity == null || mc.getNetworkHandler() == null) return;
+        if (event.entity == null || mc.player == null || mc.player.networkHandler == null) return;
 
-        // Correct way to send an attack packet in recent Minecraft versions
-        mc.getNetworkHandler().sendPacket(PlayerInteractEntityC2SPacket.attack(event.entity, mc.player.isSneaking()));
+        // Using networkHandler directly usually bypasses mapping issues
+        mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.attack(event.entity, mc.player.isSprinting()));
     }
 }
