@@ -1,8 +1,8 @@
 package com.example.addon.modules;
 
-import meteordevelopment.meteorclient.events.entity.player.InteractEntityEvent;
-import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.events.entity.player.AttackEntityEvent;
 import meteordevelopment.meteorclient.systems.modules.Categories;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 
@@ -12,11 +12,10 @@ public class DoubleAttack extends Module {
     }
 
     @EventHandler
-    private void onInteractEntity(InteractEntityEvent event) {
-        // Ensure it is an attack interaction and the entity is valid
-        if (event.action != InteractEntityEvent.Action.Attack || event.entity == null) return;
+    private void onAttackEntity(AttackEntityEvent event) {
+        if (event.entity == null || mc.getNetworkHandler() == null) return;
 
-        // Send a manual attack packet immediately after the first one
+        // Correct way to send an attack packet in recent Minecraft versions
         mc.getNetworkHandler().sendPacket(PlayerInteractEntityC2SPacket.attack(event.entity, mc.player.isSneaking()));
     }
 }
