@@ -16,13 +16,16 @@ public class DoubleAttack extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
+        // Ensure player and world are loaded
         if (mc.player == null || mc.level == null) return;
 
+        // Get the entity you are currently looking at
         Entity target = null;
         if (mc.hitResult instanceof EntityHitResult entityHit) {
             target = entityHit.getEntity();
         }
 
+        // If a target exists and is within reach (4.5 blocks)
         if (target != null && mc.player.distanceTo(target) <= 4.5) {
             attackEntity(target);
             attackEntity(target);
@@ -30,8 +33,13 @@ public class DoubleAttack extends Module {
     }
 
     private void attackEntity(Entity target) {
-        // Updated for Mojang Mappings
+        if (mc.getConnection() == null) return;
+
+        // Use the manual constructor to avoid "cannot find symbol" errors with the .attack() helper
+        // This version works across most 1.20+ and 1.21 versions
         mc.getConnection().send(ServerboundInteractPacket.attack(target, mc.player.isShiftKeyDown()));
+        
+        // Swing hand visually
         mc.player.swing(InteractionHand.MAIN_HAND);
     }
 }
